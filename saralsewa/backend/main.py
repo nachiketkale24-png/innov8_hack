@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.api.routes import router
-
+from utils import generate_suggestions
+import json
 app = FastAPI(
     title="SaralSewa – AI Governance Copilot",
     description="CivicMatch Core: Eligibility & Readiness Engine for Indian Government Schemes",
