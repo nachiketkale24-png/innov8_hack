@@ -1,0 +1,164 @@
+[
+  {
+    "id": "PM-KISAN-001",
+    "name": "PM-KISAN (Pradhan Mantri Kisan Samman Nidhi)",
+    "category": "Agriculture",
+    "description": "Direct income support of ₹6,000/year to small and marginal farmer families.",
+    "benefit": "₹6,000/year in 3 installments of ₹2,000",
+    "ministry": "Ministry of Agriculture & Farmers Welfare",
+    "eligibility_rules": {
+      "occupation": ["farmer"],
+      "max_income": 200000,
+      "min_age": 18,
+      "max_age": 99,
+      "genders": ["male", "female", "other"],
+      "states": "all",
+      "excluded_categories": ["government_employee", "income_tax_payer"]
+    },
+    "required_documents": [
+      "Aadhaar Card",
+      "Land Records / Khasra",
+      "Bank Account (Linked to Aadhaar)",
+      "Mobile Number"
+    ],
+    "application_steps": [
+      "Visit pmkisan.gov.in or nearest Common Service Centre (CSC)",
+      "Click on 'New Farmer Registration'",
+      "Enter Aadhaar number and state",
+      "Fill in personal and bank details",
+      "Upload land records",
+      "Submit and note registration number"
+    ],
+    "tags": ["farmer", "income support", "direct benefit transfer"],
+    "weight": 10
+  },
+  {
+    "id": "PMJDY-002",
+    "name": "Pradhan Mantri Jan Dhan Yojana (PMJDY)",
+    "category": "Financial Inclusion",
+    "description": "Zero-balance bank accounts with RuPay debit card, overdraft facility up to ₹10,000, and accident insurance cover.",
+    "benefit": "Zero-balance account + ₹2 lakh accident insurance + ₹10,000 overdraft",
+    "ministry": "Ministry of Finance",
+    "eligibility_rules": {
+      "occupation": "all",
+      "max_income": 500000,
+      "min_age": 10,
+      "max_age": 99,
+      "genders": ["male", "female", "other"],
+      "states": "all",
+      "excluded_categories": []
+    },
+    "required_documents": [
+      "Aadhaar Card or Voter ID or Passport",
+      "Passport-size photograph",
+      "Mobile Number"
+    ],
+    "application_steps": [
+      "Visit nearest bank branch or Business Correspondent (BC) point",
+      "Fill PMJDY account opening form",
+      "Submit KYC documents (Aadhaar / Voter ID)",
+      "Receive RuPay debit card within 10 working days"
+    ],
+    "tags": ["banking", "financial inclusion", "insurance", "overdraft"],
+    "weight": 8
+  },
+  {
+    "id": "PMAY-003",
+    "name": "Pradhan Mantri Awas Yojana - Gramin (PMAY-G)",
+    "category": "Housing",
+    "description": "Financial assistance to BPL households in rural areas for construction of pucca house.",
+    "benefit": "₹1.2 lakh (plain areas) or ₹1.3 lakh (hilly/difficult areas) for house construction",
+    "ministry": "Ministry of Rural Development",
+    "eligibility_rules": {
+      "occupation": "all",
+      "max_income": 150000,
+      "min_age": 18,
+      "max_age": 99,
+      "genders": ["male", "female", "other"],
+      "states": "all",
+      "excluded_categories": ["urban_resident"],
+      "requires_bpl": true
+    },
+    "required_documents": [
+      "Aadhaar Card",
+      "BPL Ration Card",
+      "Bank Account Details",
+      "Land Ownership Proof",
+      "SECC-2011 Registration"
+    ],
+    "application_steps": [
+      "Check name in SECC-2011 Permanent Wait List at Gram Panchayat",
+      "Approach Gram Panchayat or Block Development Office",
+      "Fill application form with Aadhaar and bank details",
+      "Survey by Gram Rozgar Sahayak",
+      "Receive sanction letter and first installment after approval"
+    ],
+    "tags": ["housing", "rural", "BPL", "construction"],
+    "weight": 9
+  },
+  {
+    "id": "PMSBY-004",
+    "name": "Pradhan Mantri Suraksha Bima Yojana (PMSBY)",
+    "category": "Insurance",
+    "description": "Accidental death and disability insurance cover at just ₹20/year premium.",
+    "benefit": "₹2 lakh on accidental death or permanent disability; ₹1 lakh on partial disability",
+    "ministry": "Ministry of Finance",
+    "eligibility_rules": {
+      "occupation": "all",
+      "max_income": 999999,
+      "min_age": 18,
+      "max_age": 70,
+      "genders": ["male", "female", "other"],
+      "states": "all",
+      "excluded_categories": []
+    },
+    "required_documents": [
+      "Aadhaar-linked Bank Account",
+      "Aadhaar Card",
+      "Mobile Number linked to Bank"
+    ],
+    "application_steps": [
+      "Log in to your bank's net banking or visit branch",
+      "Go to 'Insurance' or 'Social Security Schemes' section",
+      "Select PMSBY and authorize auto-debit of ₹20/year",
+      "Receive confirmation SMS with policy number"
+    ],
+    "tags": ["insurance", "accident", "low premium", "all citizens"],
+    "weight": 7
+  },
+  {
+    "id": "MUDRA-005",
+    "name": "PM MUDRA Yojana (Micro Units Development & Refinance Agency)",
+    "category": "Entrepreneurship",
+    "description": "Collateral-free loans up to ₹10 lakh for non-farm micro/small enterprises.",
+    "benefit": "Loans: Shishu (up to ₹50K), Kishore (₹50K–5L), Tarun (₹5L–10L)",
+    "ministry": "Ministry of Finance",
+    "eligibility_rules": {
+      "occupation": ["self_employed", "small_business", "entrepreneur"],
+      "max_income": 1000000,
+      "min_age": 18,
+      "max_age": 65,
+      "genders": ["male", "female", "other"],
+      "states": "all",
+      "excluded_categories": ["government_employee"]
+    },
+    "required_documents": [
+      "Aadhaar Card",
+      "PAN Card",
+      "Business Proof or Udyam Registration",
+      "Bank Statements (last 6 months)",
+      "Passport-size photographs",
+      "Quotations for machinery/equipment (if applicable)"
+    ],
+    "application_steps": [
+      "Visit any bank, MFI, or NBFC or apply at udyamimitra.in",
+      "Choose loan category: Shishu / Kishore / Tarun",
+      "Fill MUDRA loan application form",
+      "Submit KYC documents and business details",
+      "Bank appraises and sanctions loan",
+      "Receive MUDRA card (RuPay) for working capital"
+    ],
+    "tags": ["loan", "business", "self-employed", "entrepreneurship", "collateral-free"],
+    "weight": 9
+  }
+]
