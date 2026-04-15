@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from backend.models.schemas import UserProfile, MatchResponse
 from backend.services.civic_match import run_civic_match
 
-router = APIRouter(prefix="/api/v1", tags=["CivicMatch"])
+router = APIRouter(tags=["CivicMatch"])
 
 
 @router.post("/match", response_model=MatchResponse, summary="Run CivicMatch eligibility check")
