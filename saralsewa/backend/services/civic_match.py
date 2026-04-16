@@ -1,27 +1,32 @@
 """
 CivicMatch Core Orchestrator
-------------------------------
-Ties together:
-  data_loader → eligibility_engine → scoring → explanation_engine
-
-Returns a fully structured MatchResponse.
 """
 
-from typing import Dict, Any, List
+from typing import List
 
-from backend.services.data_loader import load_schemes
-from backend.services.eligibility_engine import check_eligibility
-from backend.services.scoring import check_documents, compute_readiness_score
-from backend.services.explanation_engine import (
+from services.data_loader import load_schemes
+from services.eligibility_engine import check_eligibility
+from services.scoring import check_documents, compute_readiness_score
+from services.explanation_engine import (
     generate_missing_conditions,
     build_action_steps,
+    summarize_eligibility,
 )
-from backend.models.schemas import EligibilityResult, MatchResponse, UserProfile
+from models.schemas import EligibilityResult, MatchResponse, UserProfile
+
+from services.supabase_client import supabase
 
 
 def run_civic_match(user_profile: UserProfile) -> MatchResponse:
     user = user_profile.model_dump()
     schemes = load_schemes()
+
+    # Category filter
+    if user_profile.category_filter:
+        schemes = [
+            s for s in schemes
+            if s["category"].lower() == user_profile.category_filter.lower()
+        ]
 
     results: List[EligibilityResult] = []
     eligible_count = 0
@@ -29,18 +34,15 @@ def run_civic_match(user_profile: UserProfile) -> MatchResponse:
     ineligible_count = 0
 
     for scheme in schemes:
-        # 1. Eligibility check
+
         is_eligible, pass_reasons, fail_reasons = check_eligibility(user, scheme)
 
-        # 2. Document check
         available_docs, missing_docs = check_documents(user, scheme)
 
-        # 3. Missing conditions (actionable gaps)
         missing_conditions = generate_missing_conditions(
             user, scheme, fail_reasons, missing_docs
         )
 
-        # 4. Readiness score
         total_rules = len(pass_reasons) + len(fail_reasons)
         total_docs = len(scheme.get("required_documents", []))
 
@@ -53,7 +55,6 @@ def run_civic_match(user_profile: UserProfile) -> MatchResponse:
             missing_conditions=missing_conditions,
         )
 
-        # 5. Action steps
         action_steps = build_action_steps(
             scheme=scheme,
             is_eligible=is_eligible,
@@ -61,7 +62,15 @@ def run_civic_match(user_profile: UserProfile) -> MatchResponse:
             missing_conditions=missing_conditions,
         )
 
-        # 6. Counters
+        summary = summarize_eligibility(
+            scheme_name=scheme["name"],
+            is_eligible=is_eligible,
+            readiness_score=score,
+            pass_reasons=pass_reasons,
+            fail_reasons=fail_reasons,
+            missing_docs=missing_docs,
+        )
+
         if is_eligible and score >= 80:
             eligible_count += 1
         elif is_eligible:
@@ -75,6 +84,7 @@ def run_civic_match(user_profile: UserProfile) -> MatchResponse:
                 scheme_name=scheme["name"],
                 category=scheme["category"],
                 benefit=scheme["benefit"],
+                ministry=scheme.get("ministry", ""),
                 is_eligible=is_eligible,
                 readiness_score=score,
                 eligibility_reasons=pass_reasons,
@@ -82,10 +92,12 @@ def run_civic_match(user_profile: UserProfile) -> MatchResponse:
                 missing_documents=missing_docs,
                 missing_conditions=missing_conditions,
                 action_steps=action_steps,
+                tags=scheme.get("tags", []),
+                summary=summary,
             )
         )
 
-    # Rank by (eligibility + score * weight)
+    # Ranking
     scheme_weight_map = {s["id"]: s.get("weight", 5) for s in schemes}
 
     def rank_key(r: EligibilityResult):
@@ -93,10 +105,35 @@ def run_civic_match(user_profile: UserProfile) -> MatchResponse:
         return eligible_bonus + r.readiness_score * scheme_weight_map.get(r.scheme_id, 5)
 
     results.sort(key=rank_key, reverse=True)
+
     for i, r in enumerate(results):
         r.relevance_rank = i + 1
 
     top = results[0].scheme_name if results else None
+    top_id = results[0].scheme_id if results else None
+
+    avg_score = (
+        round(sum(r.readiness_score for r in results) / len(results), 1)
+        if results else 0.0
+    )
+
+       # 🔥 SUPABASE SAVE
+    print("🔥 Trying to save to Supabase...")
+
+    try:
+        supabase.table("match_results").insert({
+            "user_name": user_profile.name,
+            "total_schemes": len(schemes),
+            "eligible": eligible_count,
+            "partial": partial_count,
+            "ineligible": ineligible_count,
+            "top_scheme": top
+        }).execute()
+
+        print("✅ Saved to Supabase")
+
+    except Exception as e:
+        print("❌ Supabase error:", e)
 
     return MatchResponse(
         user_name=user_profile.name,
@@ -106,4 +143,6 @@ def run_civic_match(user_profile: UserProfile) -> MatchResponse:
         ineligible_count=ineligible_count,
         results=results,
         top_recommendation=top,
+        top_recommendation_id=top_id,
+        average_readiness_score=avg_score,
     )
