@@ -335,8 +335,7 @@ if analyze_btn:
 
     with st.spinner(strings["loading"]):
         try:
-            response = requests.post(f"{API_BASE}/match", json=payload, timeout=15)
-            response.raise_for_status()
+            response = requests.post("http://localhost:8000/api/v1/match", json=payload)
             data = response.json()
             st.session_state.api_data = data
             st.session_state.last_payload = payload
