@@ -29,6 +29,7 @@ class EligibilityResult(BaseModel):
     missing_conditions: List[str]
     action_steps: List[str]
     relevance_rank: Optional[int] = None
+    readiness_timeline: dict = {}
 
 
 class MatchResponse(BaseModel):
@@ -39,3 +40,7 @@ class MatchResponse(BaseModel):
     ineligible_count: int
     results: List[EligibilityResult]
     top_recommendation: Optional[str] = None
+
+
+class ConversationalRequest(BaseModel):
+    message: str

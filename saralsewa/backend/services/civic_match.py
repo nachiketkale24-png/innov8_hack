@@ -15,6 +15,7 @@ from backend.services.scoring import check_documents, compute_readiness_score
 from backend.services.explanation_engine import (
     generate_missing_conditions,
     build_action_steps,
+    calculate_readiness_timeline,
 )
 from backend.models.schemas import EligibilityResult, MatchResponse, UserProfile
 
@@ -82,6 +83,7 @@ def run_civic_match(user_profile: UserProfile) -> MatchResponse:
                 missing_documents=missing_docs,
                 missing_conditions=missing_conditions,
                 action_steps=action_steps,
+                readiness_timeline=calculate_readiness_timeline(missing_docs),
             )
         )
 

@@ -7,6 +7,46 @@ why a user is eligible or not, and what they need to do next.
 
 from typing import List, Dict, Any
 
+DOCUMENT_SLA = {
+    "aadhaar": {"days": 0, "where": "DigiLocker (digilocker.gov.in) or UIDAI centre"},
+    "pan_card": {"days": 1, "where": "incometax.gov.in"},
+    "bank_account": {"days": 1, "where": "Any nationalized bank or CSC"},
+    "land_records": {"days": 3, "where": "Tehsildar office or Bhulekh portal"},
+    "bpl_card": {"days": 7, "where": "Talathi / Gram Panchayat"},
+    "ration_card": {"days": 7, "where": "Talathi / Gram Panchayat"},
+    "income_certificate": {"days": 14, "where": "SDM / Tehsildar office"},
+    "domicile_certificate": {"days": 10, "where": "Gram Panchayat or SDM"},
+    "caste_certificate": {"days": 21, "where": "SDM office with affidavit"}
+}
+
+def calculate_readiness_timeline(missing_documents: list[str]) -> dict:
+    if not missing_documents:
+        return {"days_to_ready": 0, "steps": [], "message": "You can apply today!"}
+        
+    steps = []
+    max_days = 0
+    
+    for doc in missing_documents:
+        sla = DOCUMENT_SLA.get(doc, {"days": 7, "where": "Local competent authority"})
+        days = sla["days"]
+        if days > max_days:
+            max_days = max_days
+            max_days = days
+        steps.append({
+            "day": days,
+            "action": f"Obtain {doc}",
+            "where": sla["where"],
+            "document": doc
+        })
+        
+    steps.sort(key=lambda x: x["day"])
+    
+    return {
+        "days_to_ready": max_days,
+        "steps": steps,
+        "message": f"You can apply in {max_days} days"
+    }
+
 
 def generate_missing_conditions(
     user: Dict[str, Any],
