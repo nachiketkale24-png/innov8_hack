@@ -51,7 +51,6 @@ class EligibilityResult(BaseModel):
     action_steps: List[str]
     tags: List[str] = []        # FIX: added tags to result for frontend display
     relevance_rank: Optional[int] = None
-    summary: Optional[str] = None  # FIX: plain English summary was generated but never included
 
 
 class MatchResponse(BaseModel):
@@ -62,7 +61,3 @@ class MatchResponse(BaseModel):
     ineligible_count: int
     results: List[EligibilityResult]
     top_recommendation: Optional[str] = None
-    # FIX: Added top_recommendation_id for deep-linking to scheme detail
-    top_recommendation_id: Optional[str] = None
-    # FIX: Added overall_readiness average
-    average_readiness_score: float = 0.0

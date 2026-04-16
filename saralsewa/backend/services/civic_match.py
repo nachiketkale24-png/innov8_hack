@@ -10,7 +10,6 @@ from services.scoring import check_documents, compute_readiness_score
 from services.explanation_engine import (
     generate_missing_conditions,
     build_action_steps,
-    summarize_eligibility,
 )
 from models.schemas import EligibilityResult, MatchResponse, UserProfile
 
@@ -92,8 +91,6 @@ def run_civic_match(user_profile: UserProfile) -> MatchResponse:
                 missing_documents=missing_docs,
                 missing_conditions=missing_conditions,
                 action_steps=action_steps,
-                tags=scheme.get("tags", []),
-                summary=summary,
             )
         )
 
