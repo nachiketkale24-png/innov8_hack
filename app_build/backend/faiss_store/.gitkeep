@@ -1,0 +1,2 @@
+# This directory holds the persisted FAISS index file (index.faiss).
+# The file is generated at runtime during PDF ingestion.

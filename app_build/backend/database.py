@@ -1,0 +1,30 @@
+"""
+NoteFlow AI — Database Layer
+MongoDB connection and collection accessors.
+"""
+
+from pymongo import MongoClient
+from pymongo.database import Database
+from pymongo.collection import Collection
+
+from backend.config import MONGODB_URI, MONGODB_DB_NAME
+
+# ── Connection ──────────────────────────────────────────
+_client: MongoClient = MongoClient(MONGODB_URI)
+db: Database = _client[MONGODB_DB_NAME]
+
+# ── Collections ─────────────────────────────────────────
+notes_col: Collection = db["notes"]
+chunks_col: Collection = db["chunks"]
+plans_col: Collection = db["plans"]
+activity_col: Collection = db["activity_log"]
+
+# ── Indexes (idempotent) ────────────────────────────────
+chunks_col.create_index("faiss_index_id", unique=True)
+chunks_col.create_index("note_id")
+activity_col.create_index("timestamp")
+
+
+def get_db() -> Database:
+    """Return the database instance (for dependency injection)."""
+    return db

@@ -1,0 +1,11 @@
+# NoteFlow AI — Backend Dependencies
+fastapi>=0.115.0
+uvicorn>=0.34.0
+pymongo>=4.12.0
+pymupdf>=1.25.0
+faiss-cpu>=1.11.0
+google-genai>=1.0.0
+python-multipart
+python-dotenv
+numpy
+requests
