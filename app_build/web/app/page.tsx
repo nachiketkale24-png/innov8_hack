@@ -45,7 +45,7 @@ export default function DashboardPage() {
     Promise.all([
       api.getScore().then(d => setScore(d.score ?? 82)).catch(() => {}),
       api.getNotes().then(d => setNoteCount(d.notes?.length ?? 0)).catch(() => {}),
-      api.getActivity().then(d => setActivities(d.activities?.slice(0, 5) ?? [])).catch(() => {}),
+      api.getActivity().then(d => setActivities(d.activity?.slice(0, 5) ?? [])).catch(() => {}),
     ]).finally(() => setLoading(false));
   }, []);
 

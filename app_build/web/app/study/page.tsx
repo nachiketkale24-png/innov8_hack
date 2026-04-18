@@ -11,7 +11,7 @@ type Action = 'summarize' | 'simplify' | 'revise';
 type ActionConfig = {
   label: string;
   icon: React.ReactNode;
-  fn: (t: string) => Promise<{ result: string }>;
+  fn: (note_id: string, batch: number) => Promise<{ note_id: string; type: string; content: string; start_page: number; end_page: number; total_pages: number; has_next: boolean }>;
 };
 
 const actionConfig: { [K in Action]: ActionConfig } = {
@@ -40,6 +40,11 @@ export default function StudyPage() {
   const [result, setResult] = useState('');
   const [loading, setLoading] = useState(false);
   const [activeAction, setActiveAction] = useState<Action | null>(null);
+  const [currentBatch, setCurrentBatch] = useState(0);
+  const [startPage, setStartPage] = useState(0);
+  const [endPage, setEndPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [hasNextBatch, setHasNextBatch] = useState(false);
   const [followUp, setFollowUp] = useState('');
 
   useEffect(() => {
@@ -51,12 +56,31 @@ export default function StudyPage() {
     setLoading(true);
     setActiveAction(action);
     setResult('');
+    setCurrentBatch(0);
     try {
-      const text = `Note title: ${selectedNote.title}. Please ${action} the content of this note.`;
-      const d = await actionConfig[action].fn(text);
-      setResult(d.result ?? 'No response from AI.');
+      const d = await actionConfig[action].fn(selectedNote._id, 0);
+      setResult(d.content ?? 'No response from AI.');
+      setStartPage(d.start_page);
+      setEndPage(d.end_page);
+      setTotalPages(d.total_pages);
+      setHasNextBatch(d.has_next);
     } catch (e: unknown) {
       setResult(`Error: ${e instanceof Error ? e.message : 'Something went wrong.'}`);
+    } finally { setLoading(false); }
+  }
+
+  async function loadNextPages() {
+    if (!selectedNote || !activeAction) return;
+    setLoading(true);
+    try {
+      const d = await actionConfig[activeAction].fn(selectedNote._id, currentBatch + 1);
+      setResult(prev => prev + '\n\n--- PAGES ' + d.start_page + '-' + d.end_page + ' ---\n\n' + (d.content ?? ''));
+      setCurrentBatch(currentBatch + 1);
+      setStartPage(d.start_page);
+      setEndPage(d.end_page);
+      setHasNextBatch(d.has_next);
+    } catch (e: unknown) {
+      alert(`Error loading next pages: ${e instanceof Error ? e.message : 'Something went wrong.'}`);
     } finally { setLoading(false); }
   }
 
@@ -164,6 +188,26 @@ export default function StudyPage() {
                 ) : result ? (
                   <motion.div key="result" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
                     <div className="text-[13px] text-[#c0c0d0] leading-relaxed whitespace-pre-wrap mb-5">{result}</div>
+                    
+                    {/* Pagination info */}
+                    {totalPages > 0 && (
+                      <div className="flex items-center justify-between mb-4 p-3 bg-[#1c1c24] border border-[#252530] rounded-xl">
+                        <span className="text-[11px] text-[#7777aa]">
+                          Viewing pages <span className="text-white font-semibold">{startPage}–{endPage}</span> of <span className="text-white font-semibold">{totalPages}</span> pages
+                        </span>
+                        {hasNextBatch && (
+                          <button
+                            onClick={loadNextPages}
+                            disabled={loading}
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-[11px] font-medium"
+                          >
+                            {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : <ArrowRight className="w-3 h-3" />}
+                            Next Pages
+                          </button>
+                        )}
+                      </div>
+                    )}
+                    
                     <div className="grid grid-cols-2 gap-3 mt-4">
                       {[
                         { icon: <Zap className="w-3.5 h-3.5 text-indigo-400" />, title: 'Key Concept', body: 'Main insight extracted from the AI analysis.' },
@@ -198,20 +242,22 @@ export default function StudyPage() {
                 <Sparkles className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" />
                 <input value={followUp} onChange={e => setFollowUp(e.target.value)}
                   onKeyDown={e => {
-                    if (e.key === 'Enter' && followUp.trim()) {
-                      api.summarize(followUp).then(d => { setResult(d.result); setActiveAction('summarize'); }).catch(() => {});
+                    if (e.key === 'Enter' && followUp.trim() && selectedNote) {
                       setFollowUp('');
+                      alert('Follow-up questions are coming soon! For now, use the action buttons to re-analyze this note.');
                     }
                   }}
-                  placeholder="Ask follow-up questions or refine this summary..."
-                  className="flex-1 bg-transparent text-white placeholder-[#44445a] text-[12.5px] outline-none" />
+                  placeholder="Follow-up questions coming soon..."
+                  disabled={loading}
+                  className="flex-1 bg-transparent text-white placeholder-[#44445a] text-[12.5px] outline-none disabled:opacity-50" />
                 <button onClick={() => {
-                  if (followUp.trim()) {
-                    api.summarize(followUp).then(d => { setResult(d.result); setActiveAction('summarize'); }).catch(() => {});
+                  if (followUp.trim() && selectedNote) {
                     setFollowUp('');
+                    alert('Follow-up questions are coming soon! For now, use the action buttons to re-analyze this note.');
                   }
                 }}
-                  className="w-7 h-7 rounded-xl bg-indigo-600 hover:bg-indigo-500 flex items-center justify-center flex-shrink-0">
+                  disabled={!followUp.trim() || loading || !selectedNote}
+                  className="w-7 h-7 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 flex items-center justify-center flex-shrink-0">
                   <ArrowRight className="w-3 h-3 text-white" />
                 </button>
               </div>

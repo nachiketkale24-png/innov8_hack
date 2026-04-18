@@ -15,7 +15,7 @@ from backend.database import notes_col, chunks_col, activity_col
 # These are imported lazily so ingestion can work in
 # "extract + chunk only" mode during incremental builds.
 try:
-    from ai.gemini_client import get_embeddings_batch
+    from backend.ai.gemini_client import get_embeddings_batch
     _HAS_EMBEDDINGS = True
 except Exception:
     _HAS_EMBEDDINGS = False

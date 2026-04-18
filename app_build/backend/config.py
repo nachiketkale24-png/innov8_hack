@@ -28,8 +28,8 @@ CHUNK_SIZE: int = 900          # characters per chunk (target ~800-1000)
 CHUNK_OVERLAP: int = 100       # character overlap between consecutive chunks
 
 # ── Retrieval ───────────────────────────────────────────
-FAISS_TOP_K: int = 5           # retrieve top-5 from FAISS
-GEMINI_CONTEXT_CHUNKS: int = 3 # only top-3 chunks sent to Gemini
+FAISS_TOP_K: int = 5                    # retrieve top-5 from FAISS
+PAGES_PER_BATCH: int = 4                # group 4 pages per AI batch (user-friendly pages view)
 
 # ── Server ──────────────────────────────────────────────
 BACKEND_HOST: str = os.getenv("BACKEND_HOST", "0.0.0.0")

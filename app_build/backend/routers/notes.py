@@ -59,7 +59,7 @@ async def delete_note(note_id: str):
 @router.get("/{note_id}/related")
 async def get_related_notes(note_id: str):
     """Get notes related to a specific note using its first chunk as query."""
-    from ai.gemini_client import get_embedding
+    from backend.ai.gemini_client import get_embedding
     from backend.services.memory import search as faiss_search
 
     # Get the first chunk of this note

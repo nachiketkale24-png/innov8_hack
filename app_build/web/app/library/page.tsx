@@ -40,7 +40,7 @@ function NoteCard({ note, onDelete, index }: { note: Note; onDelete: () => void;
       </p>
       <div className="flex items-center justify-between">
         <span className="text-[10px] text-[#44445a]">
-          {new Date(note.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+          {new Date(note.uploaded_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
         </span>
         <div className="flex gap-2.5 opacity-0 group-hover:opacity-100">
           <button className="text-[#7777aa] hover:text-indigo-400 text-[11px] flex items-center gap-1">
@@ -79,7 +79,7 @@ function NoteRow({ note, onDelete, index }: { note: Note; onDelete: () => void; 
         <div className="text-[11px] text-[#55556a]">{note.total_pages} pages · {note.total_chunks} chunks</div>
       </div>
       <div className="text-[11px] text-[#44445a] flex-shrink-0">
-        {new Date(note.created_at).toLocaleDateString()}
+        {new Date(note.uploaded_at).toLocaleDateString()}
       </div>
       <div className="flex gap-2 opacity-0 group-hover:opacity-100 flex-shrink-0">
         <button className="text-[#7777aa] hover:text-indigo-400"><Eye className="w-3.5 h-3.5" /></button>

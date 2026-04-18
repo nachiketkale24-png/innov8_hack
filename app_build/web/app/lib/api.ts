@@ -14,8 +14,8 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 
 export const api = {
   // Dashboard
-  getScore: () => request<{ score: number; metrics: Record<string, number> }>('/api/score'),
-  getActivity: () => request<{ activities: Activity[] }>('/api/activity'),
+  getScore: () => request<{ score: number; breakdown: Record<string, number> }>('/api/score'),
+  getActivity: () => request<{ activity: Activity[] }>('/api/activity'),
 
   // Library / Notes
   getNotes: () => request<{ notes: Note[] }>('/api/notes'),
@@ -36,20 +36,20 @@ export const api = {
     }),
 
   // Suggestions
-  summarize: (text: string) =>
-    request<{ result: string }>('/api/suggest/summarize', {
+  summarize: (note_id: string, batch: number = 0) =>
+    request<{ note_id: string; type: string; content: string; start_page: number; end_page: number; total_pages: number; has_next: boolean }>('/api/suggest/summarize', {
       method: 'POST',
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({ note_id, batch }),
     }),
-  simplify: (text: string) =>
-    request<{ result: string }>('/api/suggest/simplify', {
+  simplify: (note_id: string, batch: number = 0) =>
+    request<{ note_id: string; type: string; content: string; start_page: number; end_page: number; total_pages: number; has_next: boolean }>('/api/suggest/simplify', {
       method: 'POST',
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({ note_id, batch }),
     }),
-  revise: (text: string) =>
-    request<{ result: string }>('/api/suggest/revise', {
+  revise: (note_id: string, batch: number = 0) =>
+    request<{ note_id: string; type: string; content: string; start_page: number; end_page: number; total_pages: number; has_next: boolean }>('/api/suggest/revise', {
       method: 'POST',
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({ note_id, batch }),
     }),
 
   // Planner
@@ -65,10 +65,12 @@ export const api = {
 
 export interface Note {
   _id: string;
+  filename: string;
   title: string;
   total_pages: number;
   total_chunks: number;
-  created_at: string;
+  uploaded_at: string;
+  tags: string[];
   content?: string;
 }
 
@@ -82,9 +84,11 @@ export interface Activity {
 
 export interface SearchResult {
   chunk_text: string;
-  note_title: string;
+  page_number: number;
   note_id: string;
-  score: number;
+  note_title: string;
+  similarity_score: number;
+  faiss_index_id: number;
 }
 
 export interface PlanWeek {

@@ -121,7 +121,7 @@ export default function SearchPage() {
                           AI Semantic Match
                         </span>
                         <span className="text-[11px] text-[#55556a]">
-                          {Math.round(topResult.score * 100)}% Relevance
+                          {Math.round(topResult.similarity_score * 100)}% Relevance
                         </span>
                       </div>
                       <h2 className="text-[17px] font-bold text-white mb-2">{topResult.note_title}</h2>
