@@ -11,7 +11,7 @@ load_dotenv()
 # ── Gemini API ──────────────────────────────────────────
 GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
 GEMINI_EMBED_MODEL: str = "models/text-embedding-004"
-GEMINI_LLM_MODEL: str = "gemini-2.0-flash"
+GEMINI_LLM_MODEL: str = "gemini-2.5-flash"
 
 # ── MongoDB ─────────────────────────────────────────────
 MONGODB_URI: str = os.getenv("MONGODB_URI", "mongodb://localhost:27017")

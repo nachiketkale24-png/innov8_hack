@@ -10,7 +10,7 @@ from pymongo.collection import Collection
 from backend.config import MONGODB_URI, MONGODB_DB_NAME
 
 # ── Connection ──────────────────────────────────────────
-_client: MongoClient = MongoClient(MONGODB_URI)
+_client: MongoClient = MongoClient(MONGODB_URI, serverSelectionTimeoutMS=2000)
 db: Database = _client[MONGODB_DB_NAME]
 
 # ── Collections ─────────────────────────────────────────
@@ -20,9 +20,12 @@ plans_col: Collection = db["plans"]
 activity_col: Collection = db["activity_log"]
 
 # ── Indexes (idempotent) ────────────────────────────────
-chunks_col.create_index("faiss_index_id", unique=True)
-chunks_col.create_index("note_id")
-activity_col.create_index("timestamp")
+try:
+    chunks_col.create_index("faiss_index_id", unique=True)
+    chunks_col.create_index("note_id")
+    activity_col.create_index("timestamp")
+except Exception as e:
+    print(f"[WARN] Could not connect to MongoDB for indexes: {e}")
 
 
 def get_db() -> Database:

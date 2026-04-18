@@ -4,6 +4,7 @@ Wrapper for embedding and text generation via Google Gemini.
 """
 
 import numpy as np
+import time
 
 from backend.config import GEMINI_API_KEY, GEMINI_EMBED_MODEL, GEMINI_LLM_MODEL
 
@@ -45,11 +46,19 @@ def get_embedding(text: str) -> np.ndarray:
     Returns a 768-dim float32 numpy array.
     """
     client = _get_client()
-    result = client.models.embed_content(
-        model=GEMINI_EMBED_MODEL,
-        contents=text,
-    )
-    return np.array(result.embeddings[0].values, dtype=np.float32)
+    for attempt in range(5):
+        try:
+            result = client.models.embed_content(
+                model=GEMINI_EMBED_MODEL,
+                contents=text,
+            )
+            return np.array(result.embeddings[0].values, dtype=np.float32)
+        except Exception as e:
+            if "429" in str(e) or "Quota" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
+                if attempt < 4:
+                    time.sleep(18)
+                    continue
+            raise
 
 
 def get_embeddings_batch(texts: list[str]) -> np.ndarray:
@@ -57,13 +66,21 @@ def get_embeddings_batch(texts: list[str]) -> np.ndarray:
     Embed a batch of texts. Returns an (N, 768) float32 numpy array.
     """
     client = _get_client()
-    result = client.models.embed_content(
-        model=GEMINI_EMBED_MODEL,
-        contents=texts,
-    )
-    return np.array(
-        [e.values for e in result.embeddings], dtype=np.float32
-    )
+    for attempt in range(5):
+        try:
+            result = client.models.embed_content(
+                model=GEMINI_EMBED_MODEL,
+                contents=texts,
+            )
+            return np.array(
+                [e.values for e in result.embeddings], dtype=np.float32
+            )
+        except Exception as e:
+            if "429" in str(e) or "Quota" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
+                if attempt < 4:
+                    time.sleep(18)
+                    continue
+            raise
 
 
 def generate_text(system_prompt: str, user_prompt: str) -> str:
@@ -72,14 +89,22 @@ def generate_text(system_prompt: str, user_prompt: str) -> str:
     Returns the generated text as a string.
     """
     client = _get_client()
-    response = client.models.generate_content(
-        model=GEMINI_LLM_MODEL,
-        contents=user_prompt,
-        config=types.GenerateContentConfig(
-            system_instruction=system_prompt,
-            temperature=0.7,
-            max_output_tokens=2048,
-        ),
-    )
-    return response.text
+    for attempt in range(5):
+        try:
+            response = client.models.generate_content(
+                model=GEMINI_LLM_MODEL,
+                contents=user_prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_prompt,
+                    temperature=0.7,
+                    max_output_tokens=2048,
+                ),
+            )
+            return response.text
+        except Exception as e:
+            if "429" in str(e) or "Quota" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
+                if attempt < 4:
+                    time.sleep(18)
+                    continue
+            raise
 
